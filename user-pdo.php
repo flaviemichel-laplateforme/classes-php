@@ -36,7 +36,7 @@ class Userpdo
             ':firstname' => $firstname,
             ':lastname' => $lastname
         ]);
-        
+
         return [
             'login' => $login,
             'email' => $email,
@@ -47,33 +47,28 @@ class Userpdo
 
     public function connect($login, $password)
     {
-    $sql = "SELECT * FROM utilisateurs WHERE login = :login";
-    $stmt = $this->db->prepare($sql);
+        $sql = "SELECT * FROM utilisateurs WHERE login = :login";
+        $stmt = $this->db->prepare($sql);
 
-    $stmt->execute(
-        [':login' => $login]);
-    $user = $stmt->fetch(PDO::FETCH_ASSOC);
-// Vérification n°1 : Avons-nous trouvé un utilisateur ? 
-// Si le SELECT n'a rien trouvé (parce que le login n'existe pas), 
-// que contiendra la variable $user ?
-if ($user) {
-    if (password_verify($password, $user['password'])){
+        $stmt->execute(
+            [':login' => $login]
+        );
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        $this->id = $user['id'];
-        $this->login = $user['login'];
-        $this->email = $user['email'];
-        $this->firstname = $user['firstname'];
-        $this->lastname = $user['lastname'];
-    
-        return true;
-        
-    }else {
-        echo "Mauvais mot de passe";
-        return false;
+        if ($user) {
+            if (password_verify($password, $user['password'])) {
+
+                $this->id = $user['id'];
+                $this->login = $user['login'];
+                $this->email = $user['email'];
+                $this->firstname = $user['firstname'];
+                $this->lastname = $user['lastname'];
+
+                return true;
+            } else {
+                echo "Mauvais mot de passe";
+                return false;
+            }
+        }
     }
-}
-
-}
-    }
-    
 }
