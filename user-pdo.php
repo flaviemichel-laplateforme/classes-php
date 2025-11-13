@@ -123,4 +123,44 @@ class Userpdo
 
         echo "Utilisateur mis à jour !";
     }
+
+    public function isConnected()
+    {
+        if ($this->id != null) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function getAllInfos()
+    {
+        return [
+            'id' => $this->id,
+            'login' => $this->login,
+            'email' => $this->email,
+            'firstname' => $this->firstname,
+            'lastname' => $this->lastname,
+        ];
+    }
+
+    public function getLogin()
+    {
+        return $this->login;
+    }
+
+    public function getEmail()
+    {
+        return $this->email;
+    }
+
+    public function getFirstname()
+    {
+        return $this->firstname;
+    }
+
+    public function getLastname()
+    {
+        return $this->lastname;
+    }
 }
