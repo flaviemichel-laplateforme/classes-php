@@ -71,4 +71,56 @@ class Userpdo
             }
         }
     }
+    public function disconnect()
+    {
+        $this->id = null;
+        $this->login = null;
+        $this->email = null;
+        $this->firstname = null;
+        $this->lastname = null;
+    }
+
+    public function delete()
+    {
+        $sql = "DELETE FROM utilisateurs WHERE id = :id";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute(
+            [':id' => $this->id]
+        );
+        echo "Utilisateur supprimé";
+
+        $this->id = null;
+        $this->login = null;
+        $this->email = null;
+        $this->firstname = null;
+        $this->lastname = null;
+    }
+
+    public function update($login, $password, $email, $firstname, $lastname)
+    {
+        $this->login = $login;
+        $this->email = $email;
+        $this->firstname = $firstname;
+        $this->lastname = $lastname;
+
+
+
+        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+
+        $sql = "UPDATE  utilisateurs SET login = :login, password = :password , email = :email, firstname = :firstname, lastname = :lastname WHERE id = :id";
+
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([
+            ':id' => $this->id,
+            ':login' => $login,
+            ':password' => $hashedPassword,
+            ':email' => $email,
+            ':firstname' => $firstname,
+            ':lastname' => $lastname,
+        ]);
+
+        echo "Utilisateur mis à jour !";
+    }
 }
