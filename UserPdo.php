@@ -10,6 +10,18 @@ class UserPdo
 
     static $db;
 
+
+    /**
+     * Échappe et nettoie les données utilisateur
+     * @param string $value - La valeur à échapper
+     * @return string - La valeur échappée
+     */
+    private function e($value)
+    {
+        return htmlspecialchars(trim($value), ENT_QUOTES, 'UTF-8');
+    }
+
+
     /**
      * Le constructeur reçoit l'objet PDO
      * et le stocke dans la methode db_connect()
@@ -49,6 +61,27 @@ class UserPdo
 
     public function register($login, $password, $email, $firstname, $lastname)
     {
+
+        // AJOUTER : Validation de l'email
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            throw new Exception("Email invalide");
+        }
+
+        // AJOUTER : Validation du mot de passe
+        if (strlen($password) < 8) {
+            throw new Exception("Le mot de passe doit contenir au moins 8 caractères");
+        }
+
+        // AJOUTER : Validation des champs vides
+        if (empty($login) || empty($email) || empty($firstname) || empty($lastname)) {
+            throw new Exception("Tous les champs sont obligatoires");
+        }
+
+        $login = $this->e($login);
+        $email = $this->e($email);
+        $firstname = $this->e($firstname);
+        $lastname = $this->e($lastname);
+
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
         $sql = "INSERT INTO utilisateurs (login, password, email, firstname, lastname)
@@ -78,6 +111,9 @@ class UserPdo
      */
     public function connect($login, $password)
     {
+
+        $login = $this->e($login);
+
         $sql = "SELECT * FROM utilisateurs WHERE login = :login";
         $stmt = self::$db->prepare($sql);
 
@@ -143,10 +179,26 @@ class UserPdo
      */
     public function update($login, $password, $email, $firstname, $lastname)
     {
-        $this->login = $login;
-        $this->email = $email;
-        $this->firstname = $firstname;
-        $this->lastname = $lastname;
+        // AJOUTER : Validation de l'email
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            throw new Exception("Email invalide");
+        }
+
+        // AJOUTER : Validation du mot de passe
+        if (strlen($password) < 8) {
+            throw new Exception("Le mot de passe doit contenir au moins 8 caractères");
+        }
+
+        // AJOUTER : Validation des champs vides
+        if (empty($login) || empty($email) || empty($firstname) || empty($lastname)) {
+            throw new Exception("Tous les champs sont obligatoires");
+        }
+
+        // Échapper les entrées
+        $login = $this->e($login);
+        $email = $this->e($email);
+        $firstname = $this->e($firstname);
+        $lastname = $this->e($lastname);
 
 
 
