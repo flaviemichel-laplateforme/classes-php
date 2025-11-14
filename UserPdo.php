@@ -1,6 +1,6 @@
 <?php
 
-class Userpdo
+class UserPdo
 {
     private $id;
     public $login;
@@ -8,17 +8,42 @@ class Userpdo
     public $firstname;
     public $lastname;
 
-    private $db;
+    static $db;
 
     /**
      * Le constructeur reçoit l'objet PDO
      * et le stocke dans l'attribut $db
      */
-    public function __construct($db, $id = null, $login = null, $email = null, $firstname = null, $lastname = null)
+    public function __construct($login = null, $email = null, $firstname = null, $lastname = null)
     {
-        $this->db = $db;
+        $this->login = $login;
+        $this->email = $email;
+        $this->firstname = $firstname;
+        $this->lastname = $lastname;
+        $this->db_connect();
     }
 
+    public function db_connect()
+    {
+        // Configuration de la connexion à la base de données
+        $host = 'localhost';
+        $dbname = 'classes';
+        $username = 'root';
+        $password = '';  // Mot de passe vide par défaut avec Laragon
+
+        try {
+            // Création de la connexion PDO
+            $db = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);
+
+            // Configuration des options PDO
+            $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $db->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+
+            self::$db = $db;
+        } catch (PDOException $e) {
+            die("Erreur de connexion : " . $e->getMessage());
+        }
+    }
     //METHODE CRUD
 
     public function register($login, $password, $email, $firstname, $lastname)
@@ -28,7 +53,7 @@ class Userpdo
         $sql = "INSERT INTO utilisateurs (login, password, email, firstname, lastname)
                VALUES (:login, :password, :email, :firstname, :lastname)";
 
-        $stmt = $this->db->prepare($sql);
+        $stmt = self::$db->prepare($sql);
         $stmt->execute([
             ':login' => $login,
             ':password' => $hashedPassword,
@@ -48,7 +73,7 @@ class Userpdo
     public function connect($login, $password)
     {
         $sql = "SELECT * FROM utilisateurs WHERE login = :login";
-        $stmt = $this->db->prepare($sql);
+        $stmt = self::$db->prepare($sql);
 
         $stmt->execute(
             [':login' => $login]
@@ -84,7 +109,7 @@ class Userpdo
     {
         $sql = "DELETE FROM utilisateurs WHERE id = :id";
 
-        $stmt = $this->db->prepare($sql);
+        $stmt = self::$db->prepare($sql);
         $stmt->execute(
             [':id' => $this->id]
         );
@@ -111,7 +136,7 @@ class Userpdo
         $sql = "UPDATE  utilisateurs SET login = :login, password = :password , email = :email, firstname = :firstname, lastname = :lastname WHERE id = :id";
 
 
-        $stmt = $this->db->prepare($sql);
+        $stmt = self::$db->prepare($sql);
         $stmt->execute([
             ':id' => $this->id,
             ':login' => $login,
@@ -142,6 +167,10 @@ class Userpdo
             'firstname' => $this->firstname,
             'lastname' => $this->lastname,
         ];
+    }
+    public function getId()
+    {
+        return $this->id;
     }
 
     public function getLogin()
