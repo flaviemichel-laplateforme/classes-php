@@ -12,7 +12,7 @@ class UserPdo
 
     /**
      * Le constructeur reçoit l'objet PDO
-     * et le stocke dans l'attribut $db
+     * et le stocke dans la methode db_connect()
      */
     public function __construct($login = null, $email = null, $firstname = null, $lastname = null)
     {
@@ -29,7 +29,7 @@ class UserPdo
         $host = 'localhost';
         $dbname = 'classes';
         $username = 'root';
-        $password = '';  // Mot de passe vide par défaut avec Laragon
+        $password = '';
 
         try {
             // Création de la connexion PDO
@@ -44,6 +44,7 @@ class UserPdo
             die("Erreur de connexion : " . $e->getMessage());
         }
     }
+
     //METHODE CRUD
 
     public function register($login, $password, $email, $firstname, $lastname)
@@ -70,6 +71,11 @@ class UserPdo
         ];
     }
 
+
+    /**
+     * Connecte l'utilisateur
+     * @param $login, $password
+     */
     public function connect($login, $password)
     {
         $sql = "SELECT * FROM utilisateurs WHERE login = :login";
@@ -91,11 +97,16 @@ class UserPdo
 
                 return true;
             } else {
-                echo "Mauvais mot de passe";
-                return false;
+                throw new Exception("Mot de passe incorrect");
             }
+        } else {
+            throw new Exception("Utilisateur non trouvé");
         }
     }
+
+    /**
+     * Deconnecte l'utilisateur
+     */
     public function disconnect()
     {
         $this->id = null;
@@ -105,6 +116,10 @@ class UserPdo
         $this->lastname = null;
     }
 
+
+    /**
+     * Supprime et Deconnecte un utilisateur
+     */
     public function delete()
     {
         $sql = "DELETE FROM utilisateurs WHERE id = :id";
@@ -122,6 +137,10 @@ class UserPdo
         $this->lastname = null;
     }
 
+    /**
+     * Met à jour les attribut de l'objet
+     * Modifie les informations en base de données
+     */
     public function update($login, $password, $email, $firstname, $lastname)
     {
         $this->login = $login;
@@ -149,6 +168,10 @@ class UserPdo
         echo "Utilisateur mis à jour !";
     }
 
+    /**
+     * Retourne un booléen (true ou false)
+     * Permettant de savoir si un utilisateur est connecter ou non
+     */
     public function isConnected()
     {
         if ($this->id != null) {
@@ -158,6 +181,10 @@ class UserPdo
         }
     }
 
+    /**
+     * Retourne un tableau contenant
+     *  l'ensemble des informations de l'utilisateur
+     */
     public function getAllInfos()
     {
         return [
@@ -168,6 +195,7 @@ class UserPdo
             'lastname' => $this->lastname,
         ];
     }
+
     public function getId()
     {
         return $this->id;
