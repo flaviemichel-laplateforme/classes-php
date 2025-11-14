@@ -11,3 +11,4 @@ $userConnect = $userPdo->connect("flavie", "aaaaaa");
 var_dump($userConnect);
 
 echo $userPdo->getId();
+echo $userPdo->getLogin();
