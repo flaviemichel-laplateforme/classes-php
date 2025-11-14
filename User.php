@@ -20,10 +20,10 @@ class UserPdo
         $this->email = $email;
         $this->firstname = $firstname;
         $this->lastname = $lastname;
-        $this->db_connect();
+        $this->db_connect_MySqli();
     }
 
-    public function db_connect()
+    public function db_connect_MySqli()
     {
         // Configuration de la connexion à la base de données
         $host = 'localhost';
